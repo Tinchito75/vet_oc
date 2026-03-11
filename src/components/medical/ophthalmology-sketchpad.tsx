@@ -105,37 +105,66 @@ export function OphthalmologySketchpad({ onChange, species = 'canino' }: Ophthal
     );
 
     const LensBackground = () => (
-        <svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-            <text x="100" y="20" textAnchor="middle" fontFamily="sans-serif" fill="#666">OD</text>
-            <circle cx="60" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <text x="60" y="155" textAnchor="middle" fontSize="12" fill="#666">Ant</text>
-            <circle cx="140" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <text x="140" y="155" textAnchor="middle" fontSize="12" fill="#666">Post</text>
+        <svg width="100%" height="100%" viewBox="0 0 500 220" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+            {/* OD Label */}
+            <text x="125" y="22" textAnchor="middle" fontFamily="sans-serif" fontSize="16" fontWeight="bold" fill="#4B5563">OD</text>
 
-            <text x="300" y="20" textAnchor="middle" fontFamily="sans-serif" fill="#666">OI</text>
-            <circle cx="260" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <text x="260" y="155" textAnchor="middle" fontSize="12" fill="#666">Ant</text>
-            <circle cx="340" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <text x="340" y="155" textAnchor="middle" fontSize="12" fill="#666">Post</text>
+            {/* OD - Anterior (circle) */}
+            <circle cx="65" cy="105" r="52" fill="none" stroke="#333" strokeWidth="2.5" />
+            <text x="65" y="175" textAnchor="middle" fontFamily="sans-serif" fontSize="13" fill="#555">A</text>
+
+            {/* OD - Posterior (tall oval / P-shape) */}
+            <ellipse cx="175" cy="105" rx="40" ry="52" fill="none" stroke="#333" strokeWidth="2.5" />
+            <text x="175" y="175" textAnchor="middle" fontFamily="sans-serif" fontSize="13" fill="#555">P</text>
+
+            {/* OI Label */}
+            <text x="375" y="22" textAnchor="middle" fontFamily="sans-serif" fontSize="16" fontWeight="bold" fill="#4B5563">OI</text>
+
+            {/* OI - Anterior (circle) */}
+            <circle cx="315" cy="105" r="52" fill="none" stroke="#333" strokeWidth="2.5" />
+            <text x="315" y="175" textAnchor="middle" fontFamily="sans-serif" fontSize="13" fill="#555">A</text>
+
+            {/* OI - Posterior (tall oval / P-shape) */}
+            <ellipse cx="430" cy="105" rx="40" ry="52" fill="none" stroke="#333" strokeWidth="2.5" />
+            <text x="430" y="175" textAnchor="middle" fontFamily="sans-serif" fontSize="13" fill="#555">P</text>
         </svg>
     );
 
     const FundusBackground = () => (
         <svg width="100%" height="100%" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-            <g transform="translate(0,0)">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#333" strokeWidth="2" />
-                <g opacity="0.3" stroke="#555" strokeWidth="2" fill="none">
-                    <path d="M100 100 L100 60 M100 100 L70 130 M100 100 L130 130 M100 100 L80 80 M100 100 L120 80" />
-                    <ellipse cx="100" cy="100" rx="10" ry="8" />
-                </g>
-            </g>
-            <g transform="translate(200,0)">
-                <circle cx="100" cy="100" r="80" fill="none" stroke="#333" strokeWidth="2" />
-                <g opacity="0.3" stroke="#555" strokeWidth="2" fill="none">
-                    <path d="M100 100 L100 60 M100 100 L70 130 M100 100 L130 130 M100 100 L80 80 M100 100 L120 80" />
-                    <ellipse cx="100" cy="100" rx="10" ry="8" />
-                </g>
-            </g>
+
+            {/* OD - Left circle */}
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#333" strokeWidth="2" />
+            {/* OD Optic Disc */}
+            <ellipse cx="100" cy="112" rx="7" ry="5" fill="none" stroke="#333" strokeWidth="1.5" />
+            {/* OD Vessels */}
+            {/* Main trunk up */}
+            <path d="M 100,107 C 99,90 98,75 95,58" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Upper-left branch */}
+            <path d="M 95,58 C 85,48 72,40 60,30" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Upper-right branch */}
+            <path d="M 95,58 C 105,50 118,42 130,32" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Right sub-branch from upper-right */}
+            <path d="M 118,42 C 130,50 148,65 162,70" fill="none" stroke="#333" strokeWidth="1.2" strokeLinecap="round" />
+            {/* Left horizontal */}
+            <path d="M 100,112 C 82,108 65,103 35,102" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Lower-left */}
+            <path d="M 100,117 C 85,125 68,138 52,152" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            {/* Lower-right */}
+            <path d="M 100,117 C 118,125 135,138 155,148" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+
+            {/* OI - Right circle */}
+            <circle cx="300" cy="100" r="85" fill="none" stroke="#333" strokeWidth="2" />
+            {/* OI Optic Disc */}
+            <ellipse cx="300" cy="112" rx="7" ry="5" fill="none" stroke="#333" strokeWidth="1.5" />
+            {/* OI Vessels */}
+            <path d="M 300,107 C 299,90 298,75 295,58" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 295,58 C 285,48 272,40 260,30" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 295,58 C 305,50 318,42 330,32" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 318,42 C 330,50 348,65 362,70" fill="none" stroke="#333" strokeWidth="1.2" strokeLinecap="round" />
+            <path d="M 300,112 C 282,108 265,103 235,102" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 300,117 C 285,125 268,138 252,152" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M 300,117 C 318,125 335,138 355,148" fill="none" stroke="#333" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     );
 
