@@ -89,6 +89,7 @@ export function PatientSelect({ value, onSelect, className }: PatientSelectProps
             <PopoverContent
                 className="w-[300px] p-0 z-[99999] bg-popover border border-border text-popover-foreground"
                 align="start"
+                onMouseDown={(e) => e.preventDefault()}
             >
                 <Command className="bg-popover text-popover-foreground">
                     <CommandInput
@@ -113,11 +114,10 @@ export function PatientSelect({ value, onSelect, className }: PatientSelectProps
                                     <CommandItem
                                         key={patient.id}
                                         value={uniqueValue}
-                                        onSelect={() => handleSelect(String(patient.id))}
                                         className="cursor-pointer aria-selected:bg-accent aria-selected:text-accent-foreground data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
+                                        onSelect={() => handleSelect(String(patient.id))}
                                         onMouseDown={(e) => {
                                             e.preventDefault();
-                                            e.stopPropagation();
                                             handleSelect(String(patient.id));
                                         }}
                                     >
