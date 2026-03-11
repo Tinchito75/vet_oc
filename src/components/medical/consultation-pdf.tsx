@@ -1,4 +1,3 @@
-import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Image, PDFDownloadLink, Svg, Circle, Ellipse, Path } from '@react-pdf/renderer';
 
 // --- Constants ---
@@ -209,7 +208,7 @@ const ConsultationPDF = ({ data }: ConsultationPDFProps) => {
     const renderCorneaBg = () => (
         <Svg viewBox="0 0 500 250" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
             {/* OD */}
-            <Text x="125" y="30" textAnchor="middle" fill="#4B5563" fontSize="20" fontWeight="bold">OD</Text>
+            <Text x="125" y="30" textAnchor="middle" fill="#4B5563" style={{ fontSize: 20, fontWeight: 'bold' }}>OD</Text>
             <Circle cx="125" cy="140" r="90" fill="none" stroke="#6B7280" strokeWidth="2" />
             {speciesNorm === 'felino' ? (
                 <Ellipse cx="125" cy="140" rx="20" ry="60" fill="none" stroke="#6B7280" strokeWidth="2" />
@@ -218,7 +217,7 @@ const ConsultationPDF = ({ data }: ConsultationPDFProps) => {
             )}
 
             {/* OI */}
-            <Text x="375" y="30" textAnchor="middle" fill="#4B5563" fontSize="20" fontWeight="bold">OI</Text>
+            <Text x="375" y="30" textAnchor="middle" fill="#4B5563" style={{ fontSize: 20, fontWeight: 'bold' }}>OI</Text>
             <Circle cx="375" cy="140" r="90" fill="none" stroke="#6B7280" strokeWidth="2" />
             {speciesNorm === 'felino' ? (
                 <Ellipse cx="375" cy="140" rx="20" ry="60" fill="none" stroke="#6B7280" strokeWidth="2" />
@@ -232,15 +231,15 @@ const ConsultationPDF = ({ data }: ConsultationPDFProps) => {
         <Svg viewBox="0 0 400 200" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
             <Text x="100" y="20" textAnchor="middle" fill="#666">OD</Text>
             <Circle cx="60" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <Text x="60" y="155" textAnchor="middle" fontSize="12" fill="#666">Ant</Text>
+            <Text x="60" y="155" textAnchor="middle" style={{ fontSize: 12 }} fill="#666">Ant</Text>
             <Circle cx="140" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <Text x="140" y="155" textAnchor="middle" fontSize="12" fill="#666">Post</Text>
+            <Text x="140" y="155" textAnchor="middle" style={{ fontSize: 12 }} fill="#666">Post</Text>
 
             <Text x="300" y="20" textAnchor="middle" fill="#666">OI</Text>
             <Circle cx="260" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <Text x="260" y="155" textAnchor="middle" fontSize="12" fill="#666">Ant</Text>
+            <Text x="260" y="155" textAnchor="middle" style={{ fontSize: 12 }} fill="#666">Ant</Text>
             <Circle cx="340" cy="100" r="38" fill="none" stroke="#333" strokeWidth="2" />
-            <Text x="340" y="155" textAnchor="middle" fontSize="12" fill="#666">Post</Text>
+            <Text x="340" y="155" textAnchor="middle" style={{ fontSize: 12 }} fill="#666">Post</Text>
         </Svg>
     );
 
@@ -320,7 +319,7 @@ const ConsultationPDF = ({ data }: ConsultationPDFProps) => {
                             <Svg width={10} height={10} viewBox="0 0 24 24" style={{ marginRight: 4 }}>
                                 <Path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#4B5563" />
                             </Svg>
-                            <Text style={{ fontSize: 8, color: '#4B5563' }} numberOfLines={1}>gsepulveda@gracielasepulveda.com</Text>
+                            <Text style={{ fontSize: 8, color: '#4B5563' }}>gsepulveda@gracielasepulveda.com</Text>
                         </View>
 
                         {/* Social Row */}
@@ -516,7 +515,7 @@ export const DownloadReportButton = ({ data, className }: DownloadReportButtonPr
         fileName={`Informe_${data.patientName}_${data.date}.pdf`}
         className={className}
     >
-        {({ blob, url, loading, error }) =>
+        {({ loading }) =>
             loading ? 'Generando PDF...' : 'Descargar Informe PDF'
         }
     </PDFDownloadLink>

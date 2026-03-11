@@ -4,13 +4,12 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Eye, X } from 'lucide-react';
+import { Check, Eye } from 'lucide-react';
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogClose,
 } from "@/components/ui/dialog";
 
 interface PendingVisit {
@@ -32,7 +31,6 @@ interface PendingVisit {
 
 export default function BillingDashboard() {
     const [pendingVisits, setPendingVisits] = useState<PendingVisit[]>([]);
-    const [loading, setLoading] = useState(true);
     const [selectedConsultation, setSelectedConsultation] = useState<PendingVisit | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -41,7 +39,6 @@ export default function BillingDashboard() {
     }, []);
 
     const fetchPendingVisits = async () => {
-        setLoading(true);
         // Note: Assuming 'dni' and 'cuit' exist in owners table as requested by user.
         // If they don't exist, this query will fail with 400.
         // I will try to fetch them. If migration hasn't run, this might break.
@@ -94,7 +91,6 @@ export default function BillingDashboard() {
         } else {
             setPendingVisits(data as unknown as PendingVisit[]);
         }
-        setLoading(false);
     };
 
     const markAsBilled = async (id: string) => {
@@ -118,11 +114,6 @@ export default function BillingDashboard() {
     const openDetailModal = (visit: PendingVisit) => {
         setSelectedConsultation(visit);
         setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        setSelectedConsultation(null);
     };
 
     return (

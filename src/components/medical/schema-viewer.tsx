@@ -1,4 +1,3 @@
-import React from 'react';
 
 interface SchemaViewerProps {
     type: 'cornea' | 'lens' | 'fundus' | 'eyelids';

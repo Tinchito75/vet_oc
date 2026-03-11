@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { StudyType, StudyRequestData, DownloadStudyRequestButton } from './study-request-pdf';
+import { useState } from 'react';
+import type { StudyType, StudyRequestData } from './study-request-pdf';
+import { DownloadStudyRequestButton } from './study-request-pdf';
 
 const BLOOD_TEST_OPTIONS = [
     'Hemograma',
