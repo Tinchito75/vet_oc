@@ -11,13 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { PatientSelect } from './patient-select';
 import { supabase } from '@/lib/supabase';
 import { Plus } from 'lucide-react';
@@ -159,16 +152,15 @@ export function AppointmentDialog({ onAppointmentCreated }: { onAppointmentCreat
                             name="type"
                             control={control}
                             render={({ field }: { field: any }) => (
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Seleccione tipo" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {SERVICE_TYPES.map((t) => (
-                                            <SelectItem key={t} value={t}>{t}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <select
+                                    value={field.value}
+                                    onChange={e => field.onChange(e.target.value)}
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer"
+                                >
+                                    {SERVICE_TYPES.map((t) => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
                             )}
                         />
                     </div>

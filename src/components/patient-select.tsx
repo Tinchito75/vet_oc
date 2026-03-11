@@ -1,26 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Check, ChevronsUpDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
 import { supabase } from "@/lib/supabase";
 
 interface Patient {
     id: string;
     name?: string;
-    full_name?: string;
     owners?: {
         first_name?: string;
         last_name?: string;
@@ -30,15 +16,17 @@ interface Patient {
 interface PatientSelectProps {
     value?: string;
     onSelect: (patientId: string) => void;
-    className?: string; // Allow overriding className
+    className?: string;
 }
 
 export function PatientSelect({ value, onSelect, className }: PatientSelectProps) {
     const [open, setOpen] = useState(false);
     const [patients, setPatients] = useState<Patient[]>([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    // Initial Fetch (Memoized)
     useEffect(() => {
         let mounted = true;
         async function fetchPatients() {
@@ -47,7 +35,6 @@ export function PatientSelect({ value, onSelect, className }: PatientSelectProps
                 .from('patients')
                 .select('id, name, owners(first_name, last_name)')
                 .order('name');
-
             if (!mounted) return;
             if (error) console.error(error);
             if (data) setPatients(data as any[]);
@@ -57,89 +44,108 @@ export function PatientSelect({ value, onSelect, className }: PatientSelectProps
         return () => { mounted = false; };
     }, []);
 
-    const selectedPatient = useMemo(() => {
-        return patients.find((p) => String(p.id) === String(value));
-    }, [value, patients]);
+    // Close when clicking outside
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const selectedPatient = patients.find(p => String(p.id) === String(value));
+
+    const filtered = patients.filter(p => {
+        const name = p.name || "";
+        const owner = p.owners ? `${p.owners.first_name} ${p.owners.last_name}` : "";
+        const q = search.toLowerCase();
+        return name.toLowerCase().includes(q) || owner.toLowerCase().includes(q);
+    });
 
     const handleSelect = (id: string) => {
-        console.log("PatientSelect: Handle Select Triggered for", id);
         onSelect(id);
+        setSearch("");
         setOpen(false);
     };
 
     return (
-        <Popover open={open} onOpenChange={setOpen} modal={true}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className={cn(
-                        "w-full justify-between bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground",
-                        className
-                    )}
-                >
-                    {selectedPatient
-                        ? (selectedPatient.name || selectedPatient.full_name || "Sin Nombre")
-                        : "Seleccionar paciente..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-
-            <PopoverContent
-                className="w-[300px] p-0 z-[99999] bg-popover border border-border text-popover-foreground"
-                align="start"
-                onMouseDown={(e) => e.preventDefault()}
+        <div ref={containerRef} className={cn("relative w-full", className)}>
+            {/* Trigger Button */}
+            <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
+                onClick={() => {
+                    setOpen(prev => !prev);
+                    setTimeout(() => inputRef.current?.focus(), 50);
+                }}
             >
-                <Command className="bg-popover text-popover-foreground">
-                    <CommandInput
-                        placeholder="Buscar paciente..."
-                        className="bg-transparent text-foreground placeholder:text-muted-foreground"
-                    />
+                {selectedPatient
+                    ? selectedPatient.name || "Sin Nombre"
+                    : "Seleccionar paciente..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
 
-                    <CommandList className="max-h-[300px] pointer-events-auto">
-                        <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
-                            {loading ? "Cargando..." : "No se encontró paciente."}
-                        </CommandEmpty>
+            {/* Dropdown */}
+            {open && (
+                <div
+                    className="absolute left-0 top-full mt-1 w-full rounded-md border border-border bg-background shadow-lg z-[9999]"
+                    style={{ pointerEvents: 'auto' }}
+                >
+                    {/* Search Input */}
+                    <div className="flex items-center border-b border-border px-3 py-2">
+                        <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            placeholder="Buscar paciente..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                        />
+                    </div>
 
-                        <CommandGroup className="pointer-events-auto">
-                            {patients.map((patient) => {
-                                const patientName = patient.name || patient.full_name || "SIN NOMBRE";
+                    {/* Results List */}
+                    <ul className="max-h-[240px] overflow-y-auto py-1">
+                        {loading ? (
+                            <li className="px-3 py-2 text-sm text-muted-foreground">Cargando...</li>
+                        ) : filtered.length === 0 ? (
+                            <li className="px-3 py-2 text-sm text-muted-foreground">No se encontró paciente.</li>
+                        ) : (
+                            filtered.map(patient => {
+                                const patientName = patient.name || "SIN NOMBRE";
                                 const ownerName = patient.owners
                                     ? `${patient.owners.first_name} ${patient.owners.last_name}`
                                     : "";
-                                const uniqueValue = `${patientName} ${ownerName} ${patient.id}`;
+                                const isSelected = String(patient.id) === String(value);
 
                                 return (
-                                    <CommandItem
+                                    <li
                                         key={patient.id}
-                                        value={uniqueValue}
-                                        className="cursor-pointer aria-selected:bg-accent aria-selected:text-accent-foreground data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
-                                        onSelect={() => handleSelect(String(patient.id))}
+                                        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-accent hover:text-accent-foreground rounded-sm mx-1"
                                         onMouseDown={(e) => {
                                             e.preventDefault();
                                             handleSelect(String(patient.id));
                                         }}
                                     >
-                                        <Check
-                                            className={cn(
-                                                "mr-2 h-4 w-4",
-                                                value === String(patient.id) ? "opacity-100" : "opacity-0"
-                                            )}
-                                        />
+                                        <Check className={cn("h-4 w-4 shrink-0", isSelected ? "opacity-100" : "opacity-0")} />
                                         <div className="flex flex-col">
-                                            <span className="font-bold">{patientName}</span>
+                                            <span className="font-medium text-sm">{patientName}</span>
                                             {ownerName && (
                                                 <span className="text-xs text-muted-foreground">Tutor: {ownerName}</span>
                                             )}
                                         </div>
-                                    </CommandItem>
+                                    </li>
                                 );
-                            })}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                            })
+                        )}
+                    </ul>
+                </div>
+            )}
+        </div>
     );
 }
