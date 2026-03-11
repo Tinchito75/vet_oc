@@ -75,12 +75,26 @@ export function SchemaViewer({ type, species = 'canino', drawingData }: SchemaVi
     );
 
     const EyelidsBackground = () => (
-        <svg width="100%" height="100%" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
-            <text x="200" y="30" textAnchor="middle" fontFamily="sans-serif" fill="#666">OD</text>
-            <path d="M40 100 Q100 40 160 100 Q100 160 40 100Z" fill="none" stroke="#333" strokeWidth="2" />
+        <svg width="100%" height="100%" viewBox="0 0 500 200" preserveAspectRatio="xMidYMid meet" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+            {/* Labels */}
+            <text x="125" y="30" textAnchor="middle" fill="#666" fontSize="20" fontWeight="bold">OD</text>
+            <text x="375" y="30" textAnchor="middle" fill="#666" fontSize="20" fontWeight="bold">OI</text>
 
-            <text x="300" y="30" textAnchor="middle" fontFamily="sans-serif" fill="#666">OI</text>
-            <path d="M240 100 Q300 40 360 100 Q300 160 240 100Z" fill="none" stroke="#333" strokeWidth="2" />
+            {/* Right Eye (OD) */}
+            <path
+                d="M 50,100 Q 125,40 200,100 Q 125,160 50,100 Z"
+                fill="none"
+                stroke="#333"
+                strokeWidth="3"
+            />
+
+            {/* Left Eye (OI) */}
+            <path
+                d="M 300,100 Q 375,40 450,100 Q 375,160 300,100 Z"
+                fill="none"
+                stroke="#333"
+                strokeWidth="3"
+            />
         </svg>
     );
 
@@ -95,7 +109,7 @@ export function SchemaViewer({ type, species = 'canino', drawingData }: SchemaVi
     };
 
     return (
-        <div className={`relative w-full border rounded-lg bg-white overflow-hidden shadow-sm ${type === 'eyelids' ? 'aspect-[1.6/1]' : 'aspect-[2/1]'
+        <div className={`relative w-full border rounded-lg bg-white overflow-hidden shadow-sm ${type === 'eyelids' ? 'aspect-[5/2]' : 'aspect-[2/1]'
             }`}>
             {/* Layer 0: SVG Background */}
             <div className="absolute inset-0 z-0">
