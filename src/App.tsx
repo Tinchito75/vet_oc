@@ -6,6 +6,7 @@ import OwnersPage from '@/pages/owners'
 import OwnerForm from '@/pages/owner-form'
 import PatientForm from '@/pages/patient-form'
 import PatientDetails from '@/pages/patient-details'
+import PatientsPage from '@/pages/patients'
 import VisitForm from '@/pages/visit-form'
 import VisitDetails from '@/pages/visit-details'
 import SchedulePage from '@/pages/schedule'
@@ -26,6 +27,7 @@ function App() {
             <Route path="/owners/new" element={<OwnerForm />} />
             <Route path="/owners/:id" element={<OwnerForm />} />
             <Route path="/owners/:ownerId/patients/new" element={<PatientForm />} />
+            <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/patients/:id/visits/new" element={<VisitForm />} />
             <Route path="/visits/:id" element={<VisitDetails />} />

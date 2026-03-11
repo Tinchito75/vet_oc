@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Users, Calendar, Eye, Activity, Home, Receipt, TestTube2 } from 'lucide-react';
+import { Users, Calendar, Activity, Home, Receipt, TestTube2, PawPrint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ModeToggle } from './mode-toggle';
 
@@ -8,10 +8,10 @@ export default function Layout() {
 
     const navItems = [
         { href: '/', label: 'Inicio', icon: Home },
-        { href: '/owners', label: 'Pacientes y Tutores', icon: Users },
+        { href: '/patients', label: 'Pacientes 🐾', icon: PawPrint },
+        { href: '/owners', label: 'Tutores', icon: Users },
         { href: '/schedule', label: 'Agenda', icon: Calendar },
         { href: '/estudios', label: 'Solicitar Estudios', icon: TestTube2 },
-        { href: '/demo', label: 'Demo Oftalmograma', icon: Eye },
         { href: '/billing', label: 'Facturación', icon: Receipt },
         { href: '/admin', label: 'Dashboard', icon: Activity },
     ];
