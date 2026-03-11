@@ -204,7 +204,15 @@ export default function VisitDetails() {
                             <DownloadPrescriptionButton
                                 data={{
                                     patientName: visit.patients.name,
+                                    species: visit.patients.species,
+                                    breed: visit.patients.breed,
+                                    patientSex: visit.patients.gender,
+                                    patientDob: visit.patients.birth_date ? new Date(visit.patients.birth_date).toLocaleDateString() : undefined,
+                                    patientWeight: visit.patients.weight?.toString(),
                                     ownerName: `${visit.patients.owners.first_name} ${visit.patients.owners.last_name}`,
+                                    tutorDni: visit.patients.owners.dni,
+                                    tutorPhone: visit.patients.owners.phone,
+                                    tutorCuit: visit.patients.owners.cuit,
                                     date: visit.date,
                                     treatment: visit.treatment_plan
                                 }}

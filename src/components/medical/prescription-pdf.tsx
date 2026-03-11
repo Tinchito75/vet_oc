@@ -83,7 +83,15 @@ const styles = StyleSheet.create({
 interface PrescriptionData {
     doctorName?: string;
     patientName: string;
+    species?: string;
+    breed?: string;
+    patientDob?: string;
+    patientSex?: string;
+    patientWeight?: string;
     ownerName: string;
+    tutorDni?: string;
+    tutorPhone?: string;
+    tutorCuit?: string;
     date: string;
     treatment: string;
 }
@@ -143,11 +151,45 @@ const PrescriptionPDF = ({ data }: { data: PrescriptionData }) => (
                 </View>
             </View>
 
-            {/* Patient Info Bar */}
-            <View style={styles.patientBar}>
-                <Text style={styles.patientInfo}>Paciente: {data.patientName}</Text>
-                <Text style={styles.patientInfo}>Tutor: {data.ownerName}</Text>
-                <Text style={styles.patientInfo}>Fecha: {new Date(data.date).toLocaleDateString()}</Text>
+            {/* Patient Info — Normalized TUTOR / PACIENTE block */}
+            <View style={[{ backgroundColor: '#F3F4F6', padding: 10, borderRadius: 4, marginBottom: 15, flexDirection: 'column' }]}>
+
+                {/* TUTOR */}
+                <View style={{ marginBottom: 6, borderBottomWidth: 1, borderBottomColor: '#E5E7EB', paddingBottom: 4 }}>
+                    <Text style={{ fontSize: 9, fontWeight: 'bold', marginBottom: 2, textTransform: 'uppercase', color: '#111827' }}>TUTOR</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>{data.ownerName}</Text>
+                        {data.tutorDni && (
+                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>
+                                <Text style={{ fontWeight: 'bold' }}>DNI:</Text> {data.tutorDni}
+                            </Text>
+                        )}
+                        {data.tutorPhone && (
+                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>
+                                <Text style={{ fontWeight: 'bold' }}>Tel:</Text> {data.tutorPhone}
+                            </Text>
+                        )}
+                        {data.tutorCuit && (
+                            <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827' }}>
+                                <Text style={{ fontWeight: 'bold' }}>CUIT:</Text> {data.tutorCuit}
+                            </Text>
+                        )}
+                    </View>
+                </View>
+
+                {/* PACIENTE */}
+                <View>
+                    <Text style={{ fontSize: 9, fontWeight: 'bold', marginBottom: 2, textTransform: 'uppercase', color: '#111827' }}>PACIENTE</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>Nombre: {data.patientName}</Text>
+                        {data.species && <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>Especie: {data.species}</Text>}
+                        {data.breed && <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>Raza: {data.breed}</Text>}
+                        {data.patientDob && <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>F. Nac: {data.patientDob}</Text>}
+                        {data.patientSex && <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginRight: 10 }}>Sexo: {data.patientSex}</Text>}
+                        {data.patientWeight && <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827' }}>Peso: {data.patientWeight} kg</Text>}
+                        <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#111827', marginLeft: 10 }}>Fecha: {new Date(data.date).toLocaleDateString()}</Text>
+                    </View>
+                </View>
             </View>
 
             {/* Body */}
