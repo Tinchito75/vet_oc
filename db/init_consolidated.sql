@@ -38,6 +38,7 @@ create table patients (
   weight numeric, -- in kg
   gender text, -- 'Macho', 'Hembra'
   is_neutered boolean default false,
+  is_aggressive boolean default false,
   photo_url text,
   medical_history text
 );
