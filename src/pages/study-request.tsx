@@ -1,25 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Check, ChevronsUpDown } from 'lucide-react';
+import { AlertTriangle, Check, Search } from 'lucide-react';
 import { DownloadStudyRequestButton, type StudyType, type StudyRequestData } from '@/components/medical/study-request-pdf';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from '@/components/ui/command';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover';
 
 interface Owner {
     id: string;
@@ -62,7 +48,11 @@ export default function StudyRequestScreen() {
     const [selectedPatientId, setSelectedPatientId] = useState<string>('');
 
     const [openOwnerPopover, setOpenOwnerPopover] = useState(false);
+    const [ownerQuery, setOwnerQuery] = useState('');
     const [openPatientPopover, setOpenPatientPopover] = useState(false);
+    const [patientQuery, setPatientQuery] = useState('');
+    const ownerInputRef = useRef<HTMLInputElement>(null);
+    const patientInputRef = useRef<HTMLInputElement>(null);
 
     // Study Request State
     const [studyType, setStudyType] = useState<StudyType | ''>('');
@@ -202,57 +192,76 @@ export default function StudyRequestScreen() {
                     <h2 className="text-lg font-semibold border-b pb-2 mb-4 dark:border-zinc-800">2. Destinatario del Estudio</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                        {/* Selector de Tutor */}
+                        {/* Selector de Tutor - Plain Dropdown */}
                         <div className="space-y-4">
                             <div>
                                 <Label className="mb-1 block">Tutor</Label>
-                                <Popover open={openOwnerPopover} onOpenChange={setOpenOwnerPopover}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openOwnerPopover}
-                                            disabled={loadingOwners}
-                                            className="w-full justify-between font-normal bg-background text-foreground border-input"
+                                <div className="relative">
+                                    {/* Selected chip */}
+                                    {selectedOwner && ownerQuery.length === 0 ? (
+                                        <div
+                                            className="flex items-center justify-between px-3 py-2 border border-input rounded-md bg-background cursor-pointer hover:bg-accent transition-colors"
+                                            onClick={() => { setOwnerQuery(`${selectedOwner.first_name} ${selectedOwner.last_name}`); setTimeout(() => ownerInputRef.current?.focus(), 50); }}
                                         >
-                                            {loadingOwners ? "Cargando tutores..." : selectedOwner
-                                                ? `${selectedOwner.first_name} ${selectedOwner.last_name}`
-                                                : "Buscar tutor..."}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[400px] p-0" align="start">
-                                        <Command>
-                                            <CommandInput placeholder="Buscar por nombre o DNI..." />
-                                            <CommandList className="max-h-[300px]">
-                                                <CommandEmpty>No se encontró tutor.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {owners.map((owner) => (
-                                                        <CommandItem
-                                                            key={owner.id}
-                                                            value={`${owner.first_name} ${owner.last_name} ${owner.dni || ''}`}
-                                                            onSelect={() => {
-                                                                setSelectedOwnerId(owner.id);
-                                                                setOpenOwnerPopover(false);
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    selectedOwnerId === owner.id ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            <div className="flex flex-col">
-                                                                <span>{owner.first_name} {owner.last_name}</span>
-                                                                {owner.dni && <span className="text-xs text-muted-foreground">DNI: {owner.dni}</span>}
-                                                            </div>
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
+                                            <div className="flex items-center gap-2">
+                                                <Check className="h-4 w-4 text-green-500" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-semibold">{selectedOwner.first_name} {selectedOwner.last_name}</span>
+                                                    {selectedOwner.dni && <span className="text-xs text-muted-foreground">DNI: {selectedOwner.dni}</span>}
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground underline">Cambiar</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center border border-input rounded-md bg-background px-3 gap-2 focus-within:ring-2 focus-within:ring-ring">
+                                                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                                                <input
+                                                    ref={ownerInputRef}
+                                                    type="text"
+                                                    placeholder={loadingOwners ? "Cargando tutores..." : "Buscar tutor por nombre o DNI..."}
+                                                    value={ownerQuery}
+                                                    onChange={e => { setOwnerQuery(e.target.value); setOpenOwnerPopover(true); }}
+                                                    onFocus={() => setOpenOwnerPopover(true)}
+                                                    onBlur={() => setTimeout(() => setOpenOwnerPopover(false), 150)}
+                                                    className="h-10 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+                                                />
+                                                {ownerQuery && <button type="button" className="text-muted-foreground text-xs shrink-0" onMouseDown={e => { e.preventDefault(); setOwnerQuery(''); setSelectedOwnerId(''); setOpenOwnerPopover(false); }}>✕</button>}
+                                            </div>
+                                            {openOwnerPopover && (() => {
+                                                const q = ownerQuery.toLowerCase();
+                                                const filtered = owners.filter(o =>
+                                                    `${o.first_name} ${o.last_name}`.toLowerCase().includes(q) ||
+                                                    (o.dni || '').toLowerCase().includes(q)
+                                                );
+                                                return filtered.length > 0 ? (
+                                                    <div className="absolute top-full left-0 mt-1 w-full bg-background border border-border rounded-md shadow-xl z-[9999] overflow-hidden max-h-[240px] overflow-y-auto">
+                                                        <ul>
+                                                            {filtered.map(owner => (
+                                                                <li
+                                                                    key={owner.id}
+                                                                    className="px-4 py-3 hover:bg-accent cursor-pointer flex items-center justify-between border-b border-border last:border-0 transition-colors"
+                                                                    onMouseDown={e => {
+                                                                        e.preventDefault();
+                                                                        setSelectedOwnerId(owner.id);
+                                                                        setOwnerQuery('');
+                                                                        setOpenOwnerPopover(false);
+                                                                    }}
+                                                                >
+                                                                    <div className="flex flex-col">
+                                                                        <span className={cn("text-sm font-semibold", selectedOwnerId === owner.id && "text-green-500")}>{owner.first_name} {owner.last_name}</span>
+                                                                        {owner.dni && <span className="text-xs text-muted-foreground">DNI: {owner.dni}</span>}
+                                                                    </div>
+                                                                    {selectedOwnerId === owner.id && <Check className="h-4 w-4 text-green-500" />}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ) : null;
+                                            })()}
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {selectedOwner && (
@@ -279,61 +288,73 @@ export default function StudyRequestScreen() {
                             )}
                         </div>
 
-                        {/* Selector de Mascota */}
+                        {/* Selector de Mascota - Plain Dropdown */}
                         <div className="space-y-4">
                             <div>
                                 <Label className="mb-1 block">Mascota</Label>
-                                <Popover open={openPatientPopover} onOpenChange={setOpenPatientPopover}>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant="outline"
-                                            role="combobox"
-                                            aria-expanded={openPatientPopover}
-                                            disabled={!selectedOwnerId || patients.length === 0}
-                                            className="w-full justify-between font-normal bg-background text-foreground border-input"
+                                <div className="relative">
+                                    {selectedPatient && patientQuery.length === 0 ? (
+                                        <div
+                                            className="flex items-center justify-between px-3 py-2 border border-input rounded-md bg-background cursor-pointer hover:bg-accent transition-colors"
+                                            onClick={() => { setPatientQuery(selectedPatient.name); setTimeout(() => patientInputRef.current?.focus(), 50); }}
                                         >
-                                            {!selectedOwnerId
-                                                ? "Primero selecciona un tutor"
-                                                : patients.length === 0
-                                                    ? "Sin mascotas registradas"
-                                                    : selectedPatient
-                                                        ? selectedPatient.name
-                                                        : "Buscar mascota..."}
-                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-[400px] p-0" align="start">
-                                        <Command>
-                                            <CommandInput placeholder="Buscar mascota por nombre..." />
-                                            <CommandList>
-                                                <CommandEmpty>No se encontró mascota.</CommandEmpty>
-                                                <CommandGroup>
-                                                    {patients.map((patient) => (
-                                                        <CommandItem
-                                                            key={patient.id}
-                                                            value={patient.name}
-                                                            onSelect={() => {
-                                                                setSelectedPatientId(patient.id);
-                                                                setOpenPatientPopover(false);
-                                                            }}
-                                                        >
-                                                            <Check
-                                                                className={cn(
-                                                                    "mr-2 h-4 w-4",
-                                                                    selectedPatientId === patient.id ? "opacity-100" : "opacity-0"
-                                                                )}
-                                                            />
-                                                            <div className="flex flex-col">
-                                                                <span>{patient.name}</span>
-                                                                <span className="text-xs text-muted-foreground">{patient.species} - {patient.breed || 'Sin raza'}</span>
-                                                            </div>
-                                                        </CommandItem>
-                                                    ))}
-                                                </CommandGroup>
-                                            </CommandList>
-                                        </Command>
-                                    </PopoverContent>
-                                </Popover>
+                                            <div className="flex items-center gap-2">
+                                                <Check className="h-4 w-4 text-green-500" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-semibold">{selectedPatient.name}</span>
+                                                    <span className="text-xs text-muted-foreground">{selectedPatient.species} — {selectedPatient.breed || 'Sin raza'}</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-muted-foreground underline">Cambiar</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className={cn("flex items-center border border-input rounded-md bg-background px-3 gap-2 focus-within:ring-2 focus-within:ring-ring", !selectedOwnerId && "opacity-50")}>
+                                                <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                                                <input
+                                                    ref={patientInputRef}
+                                                    type="text"
+                                                    disabled={!selectedOwnerId}
+                                                    placeholder={!selectedOwnerId ? "Primero seleccioná un tutor" : patients.length === 0 ? "Sin mascotas registradas" : "Buscar mascota..."}
+                                                    value={patientQuery}
+                                                    onChange={e => { setPatientQuery(e.target.value); setOpenPatientPopover(true); }}
+                                                    onFocus={() => setOpenPatientPopover(true)}
+                                                    onBlur={() => setTimeout(() => setOpenPatientPopover(false), 150)}
+                                                    className="h-10 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none disabled:cursor-not-allowed"
+                                                />
+                                                {patientQuery && <button type="button" className="text-muted-foreground text-xs shrink-0" onMouseDown={e => { e.preventDefault(); setPatientQuery(''); setSelectedPatientId(''); setOpenPatientPopover(false); }}>✕</button>}
+                                            </div>
+                                            {openPatientPopover && patients.length > 0 && (() => {
+                                                const q = patientQuery.toLowerCase();
+                                                const filtered = patients.filter(p => p.name.toLowerCase().includes(q));
+                                                return filtered.length > 0 ? (
+                                                    <div className="absolute top-full left-0 mt-1 w-full bg-background border border-border rounded-md shadow-xl z-[9999] overflow-hidden max-h-[240px] overflow-y-auto">
+                                                        <ul>
+                                                            {filtered.map(patient => (
+                                                                <li
+                                                                    key={patient.id}
+                                                                    className="px-4 py-3 hover:bg-accent cursor-pointer flex items-center justify-between border-b border-border last:border-0 transition-colors"
+                                                                    onMouseDown={e => {
+                                                                        e.preventDefault();
+                                                                        setSelectedPatientId(patient.id);
+                                                                        setPatientQuery('');
+                                                                        setOpenPatientPopover(false);
+                                                                    }}
+                                                                >
+                                                                    <div className="flex flex-col">
+                                                                        <span className={cn("text-sm font-semibold", selectedPatientId === patient.id && "text-green-500")}>{patient.name}</span>
+                                                                        <span className="text-xs text-muted-foreground">{patient.species} — {patient.breed || 'Sin raza'}</span>
+                                                                    </div>
+                                                                    {selectedPatientId === patient.id && <Check className="h-4 w-4 text-green-500" />}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ) : null;
+                                            })()}
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {selectedPatient && (
