@@ -149,6 +149,25 @@ export default function StudyRequestScreen() {
         bloodTests,
     };
 
+    // Save study request to DB before downloading PDF
+    const saveStudyRequest = async () => {
+        if (!selectedPatientId || !studyType) return;
+        try {
+            const { error } = await supabase
+                .from('study_requests')
+                .insert({
+                    patient_id: selectedPatientId,
+                    study_type: studyType,
+                    details_text: detailsText || null,
+                    blood_tests: bloodTests.length > 0 ? bloodTests : null,
+                    requested_date: new Date().toISOString(),
+                });
+            if (error) console.error('Error saving study request:', error);
+        } catch (err) {
+            console.error('Error saving study request:', err);
+        }
+    };
+
     return (
         <div className="max-w-4xl mx-auto pb-10">
             <h1 className="text-3xl font-bold tracking-tight mb-6">Solicitar Estudios</h1>
@@ -452,7 +471,10 @@ export default function StudyRequestScreen() {
 
                 {/* 4. BOTÓN DE GENERACIÓN */}
                 <div className="pt-6 border-t border-slate-200 dark:border-zinc-800 flex justify-end">
-                    <DownloadStudyRequestButton data={studyData} />
+                    {/* Save to DB on click (capture phase fires before PDFDownloadLink) */}
+                    <div onClickCapture={saveStudyRequest}>
+                        <DownloadStudyRequestButton data={studyData} />
+                    </div>
                 </div>
             </div>
         </div>

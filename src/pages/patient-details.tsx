@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, FileText, Plus, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Clock, FileText, Plus, TriangleAlert, Microscope } from 'lucide-react';
 import { IopEvolutionChart } from '@/components/medical/iop-evolution-chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EyeComparisonTool } from '@/components/medical/eye-comparison-tool';
@@ -33,10 +33,19 @@ interface Visit {
     diagnosis: string;
 }
 
+interface StudyRequest {
+    id: string;
+    requested_date: string;
+    study_type: string;
+    details_text: string | null;
+    blood_tests: string[] | null;
+}
+
 export default function PatientDetails() {
     const { id } = useParams();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [visits, setVisits] = useState<Visit[]>([]);
+    const [studyRequests, setStudyRequests] = useState<StudyRequest[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -68,6 +77,18 @@ export default function PatientDetails() {
         if (visitsData) {
             setVisits(visitsData);
         }
+
+        // Fetch study requests
+        const { data: studyData } = await supabase
+            .from('study_requests')
+            .select('id, requested_date, study_type, details_text, blood_tests')
+            .eq('patient_id', patientId)
+            .order('requested_date', { ascending: false });
+
+        if (studyData) {
+            setStudyRequests(studyData);
+        }
+
         setLoading(false);
     }
 
@@ -158,34 +179,62 @@ export default function PatientDetails() {
                             </h3>
 
                             <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                                {visits.length === 0 ? (
-                                    <div className="pl-8 text-slate-500 italic">No hay visitas registradas.</div>
+                                {visits.length === 0 && studyRequests.length === 0 ? (
+                                    <div className="pl-8 text-slate-500 italic">No hay registros clínicos.</div>
                                 ) : (
-                                    visits.map((visit) => (
-                                        <div key={visit.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-
-                                            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 group-[.is-active]:bg-blue-500 text-slate-500 group-[.is-active]:text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                                                <FileText size={18} />
-                                            </div>
-
-                                            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card border border-border shadow-sm rounded-xl p-4">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <time className="font-mono text-xs text-gray-500 dark:text-gray-400">
-                                                        {new Date(visit.date).toLocaleDateString()}
-                                                    </time>
-                                                    <Link
-                                                        to={`/visits/${visit.id}`}
-                                                        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                                                    >
-                                                        Ver Detalles
-                                                    </Link>
+                                    // Merge and sort visits + study requests by date descending
+                                    [
+                                        ...visits.map(v => ({ type: 'visit' as const, date: v.date, data: v })),
+                                        ...studyRequests.map(s => ({ type: 'study' as const, date: s.requested_date, data: s })),
+                                    ]
+                                    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                                    .map((item) => (
+                                        item.type === 'visit' ? (
+                                            <div key={`visit-${item.data.id}`} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-blue-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                                                    <FileText size={18} />
                                                 </div>
-                                                <h4 className="font-bold text-gray-900 dark:text-white">{visit.reason}</h4>
-                                                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
-                                                    {visit.diagnosis || "Sin diagnóstico final"}
-                                                </p>
+                                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card border border-border shadow-sm rounded-xl p-4">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <time className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                                                            {new Date((item.data as Visit).date).toLocaleDateString()}
+                                                        </time>
+                                                        <Link to={`/visits/${item.data.id}`} className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                                                            Ver Detalles
+                                                        </Link>
+                                                    </div>
+                                                    <h4 className="font-bold text-gray-900 dark:text-white">{(item.data as Visit).reason}</h4>
+                                                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
+                                                        {(item.data as Visit).diagnosis || "Sin diagnóstico final"}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        ) : (
+                                            <div key={`study-${item.data.id}`} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-purple-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                                                    <Microscope size={18} />
+                                                </div>
+                                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card border border-purple-200 dark:border-purple-900/40 shadow-sm rounded-xl p-4">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <time className="font-mono text-xs text-gray-500 dark:text-gray-400">
+                                                            {new Date((item.data as StudyRequest).requested_date).toLocaleDateString()}
+                                                        </time>
+                                                        <span className="text-xs font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">Estudio</span>
+                                                    </div>
+                                                    <h4 className="font-bold text-gray-900 dark:text-white">{(item.data as StudyRequest).study_type}</h4>
+                                                    {(item.data as StudyRequest).details_text && (
+                                                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">{(item.data as StudyRequest).details_text}</p>
+                                                    )}
+                                                    {(item.data as StudyRequest).blood_tests && (item.data as StudyRequest).blood_tests!.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1 mt-2">
+                                                            {(item.data as StudyRequest).blood_tests!.map(t => (
+                                                                <span key={t} className="text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">{t}</span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
                                     ))
                                 )}
                             </div>

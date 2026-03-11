@@ -2,6 +2,7 @@
 -- WARNING: This will drop existing tables and reset the schema.
 
 -- 1. Drop existing tables if they exist
+drop table if exists study_requests cascade;
 drop table if exists medical_templates cascade;
 drop table if exists treatments cascade;
 drop table if exists findings cascade;
@@ -116,7 +117,18 @@ create table medical_templates (
   prescription_body text not null
 );
 
--- 10. Enable Row Level Security (RLS)
+-- 10. Create Study Requests Table
+create table study_requests (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  patient_id uuid references patients(id) on delete cascade not null,
+  study_type text not null, -- 'Radiografía', 'Resonancia', 'Análisis de Sangre'
+  details_text text,        -- Region / projections for radiology/MRI
+  blood_tests text[],       -- Array of selected blood tests
+  requested_date timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 11. Enable Row Level Security (RLS)
 alter table owners enable row level security;
 alter table patients enable row level security;
 alter table appointments enable row level security;
@@ -125,8 +137,9 @@ alter table findings enable row level security;
 alter table treatments enable row level security;
 alter table visit_images enable row level security;
 alter table medical_templates enable row level security;
+alter table study_requests enable row level security;
 
--- 11. Create Policies (Public Access for MVP)
+-- 12. Create Policies (Public Access for MVP)
 create policy "Public Access" on owners for all using (true) with check (true);
 create policy "Public Access" on patients for all using (true) with check (true);
 create policy "Public Access" on appointments for all using (true) with check (true);
@@ -135,6 +148,7 @@ create policy "Public Access" on findings for all using (true) with check (true)
 create policy "Public Access" on treatments for all using (true) with check (true);
 create policy "Public Access" on visit_images for all using (true) with check (true);
 create policy "Public Access" on medical_templates for all using (true) with check (true);
+create policy "Public Access" on study_requests for all using (true) with check (true);
 
 -- 12. Storage Bucket Setup (Must be done manually or via API, but here are the policies)
 -- Note: Supabase UI is recommended for creating the 'images' bucket.
