@@ -128,8 +128,9 @@
   border-color: hsl(217.2 32.6% 17.5%);
 }
 
-/* Dark Mode Calendar Icon Fix */
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
+/* Dark Mode Calendar / Clock Icon Fix */
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
 }
