@@ -99,7 +99,7 @@ export function FinancialStats() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-slate-900">Dashboard Financiero</h2>
+            <h2 className="text-2xl font-bold text-white">Dashboard Financiero</h2>
 
             {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -153,7 +153,10 @@ export function FinancialStats() {
                                 />
                                 <Tooltip
                                     formatter={(value: any) => [`$${value}`, 'Ingresos']}
-                                    cursor={{ fill: '#f1f5f9' }}
+                                    cursor={{ fill: 'transparent' }}
+                                    contentStyle={{ color: 'black' }}
+                                    itemStyle={{ color: 'black' }}
+                                    labelStyle={{ color: 'black' }}
                                 />
                                 <Bar dataKey="ingresos" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                             </BarChart>

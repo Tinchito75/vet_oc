@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Link } from 'react-router-dom';
-import { Search, PawPrint } from 'lucide-react';
+import { Search, PawPrint, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
     Table,
     TableBody,
@@ -82,6 +83,11 @@ export default function PatientsPage() {
                         {loading ? 'Cargando...' : `${patients.length} mascota${patients.length !== 1 ? 's' : ''} registrada${patients.length !== 1 ? 's' : ''}`}
                     </p>
                 </div>
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-bold">
+                    <Link to="/owners">
+                        <Plus className="mr-2 h-4 w-4" /> Nueva Mascota
+                    </Link>
+                </Button>
             </div>
 
             {/* Search */}

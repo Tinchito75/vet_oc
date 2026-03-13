@@ -170,9 +170,9 @@ export default function StudyRequestScreen() {
 
     return (
         <div className="max-w-4xl mx-auto pb-10">
-            <h1 className="text-3xl font-bold tracking-tight mb-6">Solicitar Estudios</h1>
+            <h1 className="text-3xl font-bold tracking-tight mb-6 text-foreground">Solicitar Estudios</h1>
 
-            <div className="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-xl shadow-sm p-6 space-y-8">
+            <div className="bg-card text-card-foreground border border-border rounded-xl shadow-lg p-6 space-y-8">
                 {/* 1. SELECCIÓN DE ESTUDIO */}
                 <section>
                     <h2 className="text-lg font-semibold border-b pb-2 mb-4 dark:border-zinc-800">1. Tipo de Estudio</h2>
@@ -286,22 +286,22 @@ export default function StudyRequestScreen() {
                             {selectedOwner && (
                                 <div className="bg-slate-50 dark:bg-zinc-900/50 p-4 rounded-lg border border-slate-100 dark:border-zinc-800 space-y-3">
                                     <div>
-                                        <Label className="text-xs text-slate-500 mb-1 block">Nombre Completo</Label>
-                                        <Input readOnly value={`${selectedOwner.first_name} ${selectedOwner.last_name}`} className="bg-slate-100 dark:bg-zinc-800/50 text-slate-600 dark:text-slate-400 cursor-not-allowed focus-visible:ring-0" />
+                                        <Label className="text-xs text-muted-foreground mb-1 block">Nombre Completo</Label>
+                                        <Input readOnly value={`${selectedOwner.first_name} ${selectedOwner.last_name}`} className="bg-muted text-muted-foreground cursor-not-allowed focus-visible:ring-0 border-border" />
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <Label className="text-xs text-slate-500 mb-1 block">DNI</Label>
-                                            <Input readOnly value={selectedOwner.dni || '-'} className="bg-slate-100 dark:bg-zinc-800/50 text-slate-600 dark:text-slate-400 cursor-not-allowed focus-visible:ring-0" />
+                                            <Label className="text-xs text-muted-foreground mb-1 block">DNI</Label>
+                                            <Input readOnly value={selectedOwner.dni || '-'} className="bg-muted text-muted-foreground cursor-not-allowed focus-visible:ring-0 border-border" />
                                         </div>
                                         <div>
-                                            <Label className="text-xs text-slate-500 mb-1 block">Teléfono</Label>
-                                            <Input readOnly value={selectedOwner.phone || '-'} className="bg-slate-100 dark:bg-zinc-800/50 text-slate-600 dark:text-slate-400 cursor-not-allowed focus-visible:ring-0" />
+                                            <Label className="text-xs text-muted-foreground mb-1 block">Teléfono</Label>
+                                            <Input readOnly value={selectedOwner.phone || '-'} className="bg-muted text-muted-foreground cursor-not-allowed focus-visible:ring-0 border-border" />
                                         </div>
                                     </div>
                                     <div>
-                                        <Label className="text-xs text-slate-500 mb-1 block">Email</Label>
-                                        <Input readOnly value={selectedOwner.email || '-'} className="bg-slate-100 dark:bg-zinc-800/50 text-slate-600 dark:text-slate-400 cursor-not-allowed focus-visible:ring-0" />
+                                        <Label className="text-xs text-muted-foreground mb-1 block">Email</Label>
+                                        <Input readOnly value={selectedOwner.email || '-'} className="bg-muted text-muted-foreground cursor-not-allowed focus-visible:ring-0 border-border" />
                                     </div>
                                 </div>
                             )}
