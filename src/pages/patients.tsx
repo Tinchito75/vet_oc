@@ -84,7 +84,7 @@ export default function PatientsPage() {
                     </p>
                 </div>
                 <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-bold">
-                    <Link to="/owners">
+                    <Link to="/patients/new">
                         <Plus className="mr-2 h-4 w-4" /> Nueva Mascota
                     </Link>
                 </Button>

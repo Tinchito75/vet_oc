@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, User } from 'lucide-react';
+
+import { TutorSelect } from '@/components/tutor-select';
 
 export default function PatientForm() {
     const navigate = useNavigate();
     const { id, ownerId } = useParams(); // id is patient id
-    const isEditing = Boolean(id && !ownerId); // If ownerId is in URL, we are creating new for that owner
+    const isEditing = Boolean(id && !ownerId);
+    const isStandaloneCreate = !id && !ownerId;
 
     // If creating new, ownerId comes from URL. If editing, we fetch it.
     const [targetOwnerId, setTargetOwnerId] = useState<string | null>(ownerId || null);
@@ -68,8 +71,10 @@ export default function PatientForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!targetOwnerId && !ownerId) {
-            alert("Error: No owner ID found");
+        const finalOwnerId = targetOwnerId || ownerId;
+        
+        if (!finalOwnerId) {
+            alert("Error: Por favor seleccione un tutor para la mascota.");
             return;
         }
         setIsLoading(true);
@@ -77,7 +82,7 @@ export default function PatientForm() {
         const payload = {
             ...formData,
             weight: formData.weight ? parseFloat(formData.weight) : null,
-            owner_id: targetOwnerId || ownerId,
+            owner_id: finalOwnerId,
         };
 
         try {
@@ -94,7 +99,7 @@ export default function PatientForm() {
                 if (error) throw error;
             }
             // Go back to owner details
-            navigate(`/owners/${targetOwnerId || ownerId}`);
+            navigate(`/owners/${finalOwnerId}`);
         } catch (error) {
             console.error('Error saving patient:', error);
             alert('Error al guardar. Por favor revise los datos.');
@@ -107,7 +112,7 @@ export default function PatientForm() {
         <div className="max-w-2xl mx-auto space-y-6">
             <div className="flex items-center gap-4">
                 <Button variant="ghost" size="sm" asChild>
-                    <Link to={targetOwnerId ? `/owners/${targetOwnerId}` : '/owners'}>
+                    <Link to={targetOwnerId ? `/owners/${targetOwnerId}` : '/patients'}>
                         <ArrowLeft className="mr-2 h-4 w-4" /> Volver
                     </Link>
                 </Button>
@@ -118,6 +123,18 @@ export default function PatientForm() {
 
             <div className="bg-card border border-border shadow-md rounded-xl p-6">
                 <form onSubmit={handleSubmit} className="space-y-4">
+                    {isStandaloneCreate && (
+                        <div className="space-y-2 pb-4 border-b border-border mb-4">
+                            <label className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                                <User className="h-4 w-4" /> Seleccionar Tutor (Obligatorio) *
+                            </label>
+                            <TutorSelect 
+                                value={targetOwnerId || ""} 
+                                onSelect={(oid) => setTargetOwnerId(oid)} 
+                            />
+                        </div>
+                    )}
+
                     <div className="space-y-2">
                         <label htmlFor="name" className="text-sm font-medium text-foreground">Nombre *</label>
                         <input

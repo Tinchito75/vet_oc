@@ -26,6 +26,7 @@ function App() {
             <Route path="/owners" element={<OwnersPage />} />
             <Route path="/owners/new" element={<OwnerForm />} />
             <Route path="/owners/:id" element={<OwnerForm />} />
+            <Route path="/patients/new" element={<PatientForm />} />
             <Route path="/owners/:ownerId/patients/new" element={<PatientForm />} />
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/patients/:id" element={<PatientDetails />} />

@@ -65,7 +65,7 @@ export default function OwnersPage() {
                         Gestiona la base de datos de clientes y sus mascotas.
                     </p>
                 </div>
-                <Button asChild>
+                <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-bold">
                     <Link to="/owners/new">
                         <Plus className="mr-2 h-4 w-4" /> Nuevo Tutor
                     </Link>
